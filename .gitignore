@@ -1,3 +1,4 @@
 /.idea/
-/Ctfblack/
+Ctfblack
+.DS_Store
 project.properties

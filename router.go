@@ -34,6 +34,8 @@ func CollectRouter(r *gin.Engine) *gin.Engine {
 	r.POST("api/problem/upload",controller.ProblemUpload)
 	r.GET("api/problem",controller.FinProblem)
 	r.GET("api/problem/misc/:id",controller.MiscProblemDownload) //杂项问题下载接口
+	//验证答案
+	r.GET("api/problem/answer",controller.VerifyAnswer)
 	return r
 }
 
