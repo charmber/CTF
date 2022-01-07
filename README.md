@@ -1,4 +1,4 @@
-## 基于GO-Gin+Grom的后端服务框架
+## 基于GO-Gin+Grom的CTF后端服
 
 适用于初步入门，快速搭建后端的新手
 
@@ -30,9 +30,6 @@
 
 数据库创建字段存放结构体
 
-**response**
-
-数据发送接收请求函数封装
 
 **util**
 
@@ -62,14 +59,12 @@
 
 对后端进行了跨域问题的解决
 
+用户验证新增jwt令牌支持
+
 ### 该框架配合系统
 
 **后端管理后台Vue+Gin+Grom**
 
-[Vue后台开源地址](https://github.com/charmber/Vue_element-Backstage.git)
-
-**小程序管理程序+Gin+Grom**
-
-[小程序开源地址](https://github.com/charmber/WeChat-Mini-Program.git)
+[CTF前端页面后台开源地址](https://github.com/charmber/Vue_element-Backstage.git)
 
 
