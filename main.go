@@ -6,15 +6,16 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
-func main()  {
+func main() {
 
-	db:=common.InitDB()
+	db := common.InitDB()
 	defer db.Close()
+	rdb := common.InitRedis()
+	defer rdb.Close()
 
 	r := gin.Default()
-	r=CollectRouter(r)
+	r = CollectRouter(r)
 	panic(r.Run(":9000"))
 }
-
 
 //CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build main.go router.go
