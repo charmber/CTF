@@ -23,8 +23,11 @@ func CollectRouter(r *gin.Engine) *gin.Engine {
 
 	r.GET("test", controller.Tes)
 	r.POST("article/create", controller.CreatArticle) //添加文章
-	r.GET("article/get_rec", controller.Recommend)    //推荐文章
-	r.GET("article/fin", controller.FindArticle)      //查询文章
+	r.POST("article/create_notice", controller.CreatNotice)
+
+	r.GET("article/get_rec", controller.Recommend) //推荐文章
+	r.GET("article/get_notice", controller.FindNotice)
+	r.GET("article/fin", controller.FindArticle) //查询文章
 	//浏览量
 	r.GET("api/article/views/:id", controller.PageViews)
 

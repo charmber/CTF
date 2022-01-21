@@ -2,12 +2,18 @@ package test
 
 import (
 	"CTF/common"
-	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
-func Test(t *gin.Context) {
-	rdb := common.GetRedis()
-	w, _ := rdb.SIsMember("20200909", "8").Result()
-	fmt.Println(w)
+func Test(f *gin.Context) {
+	DB := common.GetDB()
+	type Article struct {
+		Name  string
+		Title string
+	}
+	var cat []Article
+	DB.Limit(5).Order("created_at desc").Select([]string{"name", "title"}).Find(&cat)
+	f.JSON(200, gin.H{
+		"data": cat,
+	})
 }
