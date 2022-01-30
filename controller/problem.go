@@ -109,7 +109,6 @@ func VerifyAnswer(v *gin.Context) {
 		w, _ := re.SIsMember(json.Number, json.Display).Result()
 		if !w {
 			re.Do("sadd", json.Number, json.Display)
-			fmt.Println("test")
 			DB.Where("display=?", json.Display).Find(&tmp).Update("problem_pass_number", gorm.Expr("problem_pass_number+ ?", 1))
 		}
 	} else {

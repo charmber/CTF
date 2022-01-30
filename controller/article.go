@@ -51,6 +51,8 @@ func CreatArticle(c *gin.Context) {
 		Time:     json.Time,
 	}
 	DB.Create(&NewArt)
+	re := common.GetRedis()
+	re.Do("sadd", "article", NewArt.ID)
 	//返回结果
 	c.JSON(200, gin.H{
 		"code": 200,
@@ -96,6 +98,15 @@ func CreatNotice(c *gin.Context) {
 // PageViews 文章浏览量
 func PageViews(p *gin.Context) {
 	id := p.Param("id")
+	re := common.GetRedis()
+	w, _ := re.SIsMember("article", id).Result() //先查询缓存是否存在
+	if !w {
+		p.JSON(http.StatusOK, gin.H{
+			"code": 404,
+			"msg":  "未查询到该文章",
+		})
+		return
+	}
 	DB := common.GetDB()
 	var art model.Article
 	DB.Where("id=?", id).Find(&art).Update("Recommend", art.Recommend+1)

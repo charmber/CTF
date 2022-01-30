@@ -2,6 +2,7 @@ package main
 
 import (
 	"CTF/common"
+	"CTF/thread"
 	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
@@ -9,8 +10,11 @@ import (
 func main() {
 
 	db := common.InitDB()
-	defer db.Close()
 	rdb := common.InitRedis()
+	go thread.SyncMysqlRedis()
+
+	defer db.Close()
+
 	defer rdb.Close()
 
 	r := gin.Default()

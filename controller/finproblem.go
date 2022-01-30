@@ -9,6 +9,7 @@ import (
 	"net/http"
 )
 
+// FinProblem 问题列表
 func FinProblem(f *gin.Context) {
 	DB := common.GetDB()
 	var tmp []model.Problem
@@ -25,6 +26,7 @@ func FinProblem(f *gin.Context) {
 	})
 }
 
+// UserFinProblem 登录状态获取
 func UserFinProblem(u *gin.Context) {
 	type Problem struct {
 		Number string `json:"number"`

@@ -10,7 +10,7 @@ var DB *gorm.DB
 // InitDB 数据库配置
 func InitDB() *gorm.DB {
 	driverName := "mysql"
-	db, err := gorm.Open(driverName, "root:131420tj@(127.0.0.1:3306)/article?charset=utf8&parseTime=True&loc=Local&timeout=3600s")
+	db, err := gorm.Open(driverName, "root:131420tj@(127.0.01:3306)/article?charset=utf8&parseTime=True&loc=Local&timeout=3600s")
 	if err != nil {
 		panic("failed to connect database,err:" + err.Error())
 	}
