@@ -1,19 +1,14 @@
 package test
 
 import (
-	"CTF/common"
+	"CTF/model/global"
+	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
 func Test(f *gin.Context) {
-	DB := common.GetDB()
-	type Article struct {
-		Name  string
-		Title string
-	}
-	var cat []Article
-	DB.Limit(5).Order("created_at desc").Select([]string{"name", "title"}).Find(&cat)
-	f.JSON(200, gin.H{
-		"data": cat,
-	})
+	id := f.Query("id")
+	global.Operate <- 1
+	global.DockerID <- id
+	fmt.Println("test success!")
 }

@@ -27,8 +27,9 @@ func Recommend(r *gin.Context) {
 func CreatArticle(c *gin.Context) {
 	DB := common.GetDB()
 	type Article struct {
-		User     string `json:"user"`      //账号
-		Name     string `json:"name"`      //用户名
+		Number   string `json:"number"` //账号
+		UserName string `json:"username"`
+		Name     string `json:"name"`      //名字
 		Title    string `json:"title"`     //标题
 		NewsType string `json:"news_type"` //文章类型
 		Author   string `json:"author"`    //作者
@@ -42,7 +43,7 @@ func CreatArticle(c *gin.Context) {
 	json := Article{}
 	c.BindJSON(&json)
 	NewArt := model.Article{
-		User:     json.User,
+		Number:   json.Number,
 		Name:     json.Name,
 		Title:    json.Title,
 		NewsType: json.NewsType,
@@ -53,6 +54,7 @@ func CreatArticle(c *gin.Context) {
 	DB.Create(&NewArt)
 	re := common.GetRedis()
 	re.Do("sadd", "article", NewArt.ID)
+	re.ZIncrBy("Leaderboard", 1, json.UserName)
 	//返回结果
 	c.JSON(200, gin.H{
 		"code": 200,

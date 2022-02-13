@@ -2,6 +2,8 @@ package main
 
 import (
 	"CTF/common"
+	"CTF/controller/WebProblem"
+	"CTF/model/global"
 	"CTF/thread"
 	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -12,6 +14,7 @@ func main() {
 	db := common.InitDB()
 	rdb := common.InitRedis()
 	go thread.SyncMysqlRedis()
+	go WebProblem.Client(":8080", global.Operate, global.DockerID)
 
 	defer db.Close()
 

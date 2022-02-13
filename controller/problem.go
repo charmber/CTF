@@ -87,10 +87,11 @@ func MiscProblemDownload(p *gin.Context) {
 // VerifyAnswer 验证答案
 func VerifyAnswer(v *gin.Context) {
 	type Ans struct {
-		Answer  string `json:"answer"`
-		Number  string `json:"number"`
-		Token   string `json:"token"`
-		Display string `json:"display"`
+		Answer   string `json:"answer"`
+		UserName string `json:"username"`
+		Token    string `json:"token"`
+		Number   string `json:"number"`
+		Display  string `json:"display"`
 	}
 	DB := common.GetDB()
 	json := Ans{}
@@ -109,6 +110,7 @@ func VerifyAnswer(v *gin.Context) {
 		w, _ := re.SIsMember(json.Number, json.Display).Result()
 		if !w {
 			re.Do("sadd", json.Number, json.Display)
+			re.ZIncrBy("Leaderboard", 5, json.UserName)
 			DB.Where("display=?", json.Display).Find(&tmp).Update("problem_pass_number", gorm.Expr("problem_pass_number+ ?", 1))
 		}
 	} else {

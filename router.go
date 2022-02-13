@@ -18,10 +18,6 @@ func CollectRouter(r *gin.Engine) *gin.Engine {
 	//上传轮播图
 	r.POST("api/image/carousel/upload", controller.CarouselUpload)
 
-	r.GET("file/down/2", controller.Test01)
-	r.GET("file/down/3", controller.Test02)
-
-	r.GET("test", controller.Tes)
 	r.POST("article/create", controller.CreatArticle) //添加文章
 	r.POST("article/create_notice", controller.CreatNotice)
 
@@ -42,5 +38,9 @@ func CollectRouter(r *gin.Engine) *gin.Engine {
 	r.GET("api/problem/misc/:id", controller.MiscProblemDownload) //杂项问题下载接口
 	//验证答案
 	r.POST("api/problem/answer", controller.VerifyAnswer)
+
+	//排行榜系统
+	r.GET("api/leaderboard/find", controller.InquireLeaderboard)
+
 	return r
 }
