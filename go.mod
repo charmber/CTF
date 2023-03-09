@@ -9,6 +9,8 @@ require (
 	github.com/jinzhu/gorm v1.9.16
 	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/onsi/gomega v1.17.0 // indirect
+	github.com/spf13/cast v1.5.0 // indirect
 	google.golang.org/grpc v1.44.0
-	google.golang.org/protobuf v1.26.0 // indirect
+	google.golang.org/protobuf v1.26.0
+	gorm.io/driver/mysql v1.3.5
 )

@@ -78,10 +78,22 @@ func MiscProblemDownload(p *gin.Context) {
 	p.Writer.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename)) //fmt.Sprintf("attachment; filename=%s", filename)对下载的文件重命名
 	p.Writer.Header().Add("Content-Type", "application/octet-stream")
 	p.File("./data/file/Misc/" + filename)
-	//p.JSON(200,gin.H{
-	//	"name":filename,
-	//	"msg":"获取文件成功",
-	//})
+}
+
+// ReverseProblemDownload 逆向题目下载
+func ReverseProblemDownload(p *gin.Context) {
+	id := p.Param("id")
+	id = id + ".zip"
+	filename := util.LoadFile(id, "./data/file/Reverse/")
+	if filename == "err" {
+		p.JSON(500, gin.H{
+			"msg": "获取文件失败",
+		})
+		return
+	}
+	p.Writer.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename)) //fmt.Sprintf("attachment; filename=%s", filename)对下载的文件重命名
+	p.Writer.Header().Add("Content-Type", "application/octet-stream")
+	p.File("./data/file/Misc/" + filename)
 }
 
 // VerifyAnswer 验证答案
@@ -96,10 +108,12 @@ func VerifyAnswer(v *gin.Context) {
 	DB := common.GetDB()
 	json := Ans{}
 	v.BindJSON(&json)
-	if !util.VerifyPermissions(json.Token, v) {
+	_, ok := util.VerifyPermissions(json.Token, v)
+	if !ok {
 		return
 	}
 	var tmp = model.Problem{}
+	var Sub = model.SubmitProblem{}
 	DB.Where("display=?", json.Display).Find(&tmp).Update("problem_submit_number", gorm.Expr("problem_submit_number+ ?", 1))
 	if json.Answer == tmp.Answer {
 		v.JSON(200, gin.H{
@@ -107,11 +121,23 @@ func VerifyAnswer(v *gin.Context) {
 			"msg":  "答案正确",
 		})
 		re := common.GetRedis()
+		//查找缓存当中是否存在
 		w, _ := re.SIsMember(json.Number, json.Display).Result()
 		if !w {
-			re.Do("sadd", json.Number, json.Display)
-			re.ZIncrBy("Leaderboard", 5, json.UserName)
-			DB.Where("display=?", json.Display).Find(&tmp).Update("problem_pass_number", gorm.Expr("problem_pass_number+ ?", 1))
+			result := DB.Where("number=? AND problem_id=?", json.Number, json.Display).Find(&Sub)
+			if result.RowsAffected == 0 {
+				//添加到缓存
+				re.Do("sadd", json.Number, json.Display)
+				//排行榜积分增加
+				re.ZIncrBy("Leaderboard", 5, json.UserName)
+				//题目通过次数增加
+				DB.Where("display=?", json.Display).Find(&tmp).Update("problem_pass_number", gorm.Expr("problem_pass_number+ ?", 1))
+				Add := model.SubmitProblem{
+					Number:    json.Number,
+					ProblemId: json.Display,
+				}
+				DB.Create(&Add)
+			}
 		}
 	} else {
 		v.JSON(400, gin.H{

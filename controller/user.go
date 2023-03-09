@@ -9,9 +9,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
+// Register 注册用户
 func Register(c *gin.Context) {
 
 	DB := common.GetDB()
@@ -99,6 +101,7 @@ func Register(c *gin.Context) {
 	})
 }
 
+// Login 用户登录
 func Login(lg *gin.Context) {
 
 	DB := common.GetDB()
@@ -166,7 +169,7 @@ func Login(lg *gin.Context) {
 	//}
 
 	//发放token
-	token, _ := util.CreateToken(json.Number)
+	token, _ := util.CreateToken(json.Number, 0)
 
 	//返回结果
 	lg.JSON(200, gin.H{
@@ -216,4 +219,69 @@ func Encode(data string) string {
 	h := md5.New()
 	h.Write([]byte(data))
 	return hex.EncodeToString(h.Sum(nil))
+}
+
+// GetUserList 获取用户列表
+func GetUserList(g *gin.Context) {
+	token := g.Query("token")
+	page, _ := strconv.Atoi(g.Query("page"))
+	limit, _ := strconv.Atoi(g.Query("limit"))
+	data, ok := util.VerifyPermissions(token, g)
+	if !ok {
+		return
+	}
+	var UserList []model.ComputerUser
+	DB := common.GetDB()
+	if data["permissions"] == 1 {
+		DB.Select([]string{"id", "name", "profession", "email", "number", "integral"}).Limit(limit).Offset((page - 1) * limit).Find(&UserList)
+		g.JSON(200, gin.H{
+			"code": 200,
+			"data": UserList,
+		})
+		return
+	} else {
+		g.JSON(http.StatusForbidden, gin.H{
+			"code": 403,
+			"data": "未授权访问",
+		})
+	}
+
+}
+
+// DelUser 删除用户
+func DelUser(d *gin.Context) {
+	id, _ := strconv.Atoi(d.Query("id"))
+	token := d.Query("token")
+	data, ok := util.VerifyPermissions(token, d)
+	if !ok {
+		return
+	}
+	DB := common.GetDB()
+	if data["permissions"] == 1 {
+		DB.Delete(model.ComputerUser{}, id)
+		d.JSON(200, gin.H{
+			"code": 200,
+			"msg":  "成功",
+		})
+		return
+	} else {
+		d.JSON(http.StatusForbidden, gin.H{
+			"code": 403,
+			"msg":  "未授权访问",
+		})
+	}
+
+}
+
+// CheckJwt 验证jwt实效
+func CheckJwt(c *gin.Context) {
+	token := c.Query("token")
+	_, ok := util.VerifyPermissions(token, c)
+	if !ok {
+		return
+	}
+	c.JSON(200, gin.H{
+		"code": 200,
+		"msg":  "token正常",
+	})
 }

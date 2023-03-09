@@ -28,15 +28,15 @@
 
 自定义函数存放目录
 
-**`go.mod`和`go.sum`**
+`go.mod`和`go.sum`
 
 包管理
 
-`**main.go**`
+`main.go`
 
 存放主函数
 
-`**routes.go**`
+`routes.go`
 
 路由文件
 
