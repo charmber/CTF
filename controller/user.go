@@ -8,6 +8,7 @@ import (
 	"encoding/hex"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"github.com/spf13/cast"
 	"net/http"
 	"strconv"
 	"strings"
@@ -122,45 +123,45 @@ func Login(lg *gin.Context) {
 	if json.Tp == "1" {
 		//数据验证
 		if len(json.Password) <= 6 {
-			lg.JSON(http.StatusUnprocessableEntity, gin.H{"code": 422, "msg": "密码不能少于6位"})
+			lg.JSON(200, gin.H{"code": 403, "msg": "密码不能少于6位"})
 			return
 		}
 		//判断是否存在
 		result := DB.Where("number=?", json.Number).Find(&user)
 		if result.RowsAffected == 0 {
-			lg.JSON(http.StatusUnprocessableEntity, gin.H{"code": 422, "msg": "用户不存在"})
+			lg.JSON(200, gin.H{"code": 403, "msg": "用户不存在"})
 			return
 		}
 	} else if json.Tp == "2" {
 		//数据验证
 		if len(json.Password) <= 6 {
-			lg.JSON(http.StatusUnprocessableEntity, gin.H{"code": 422, "msg": "密码不能少于6位"})
+			lg.JSON(200, gin.H{"code": 403, "msg": "密码不能少于6位"})
 			return
 		}
 		//判断是否存在
 		result := DB.Where("user_name=?", json.UserName).Find(&user)
 		if result.RowsAffected == 0 {
-			lg.JSON(http.StatusUnprocessableEntity, gin.H{"code": 422, "msg": "用户不存在"})
+			lg.JSON(200, gin.H{"code": 403, "msg": "用户不存在"})
 			return
 		}
 	} else if json.Tp == "3" {
 		//数据验证
 		if len(json.Password) <= 6 {
-			lg.JSON(http.StatusUnprocessableEntity, gin.H{"code": 422, "msg": "密码不能少于6位"})
+			lg.JSON(200, gin.H{"code": 403, "msg": "密码不能少于6位"})
 			return
 		}
 		//判断是否存在
 		result := DB.Where("email=?", json.Email).Find(&user)
 		if result.RowsAffected == 0 {
-			lg.JSON(http.StatusUnprocessableEntity, gin.H{"code": 422, "msg": "用户不存在"})
+			lg.JSON(200, gin.H{"code": 403, "msg": "用户不存在"})
 			return
 		}
 	} else {
-		lg.JSON(http.StatusUnprocessableEntity, gin.H{"code": 422, "msg": "不存在登录方式"})
+		lg.JSON(200, gin.H{"code": 404, "msg": "不存在登录方式"})
 	}
 
 	if Check(json.Password, user.Password) != true {
-		lg.JSON(http.StatusBadRequest, gin.H{"code": 400, "msg": "密码错误"})
+		lg.JSON(200, gin.H{"code": 400, "msg": "密码错误"})
 		return
 	}
 	//if json.Password!=user.Password{
@@ -276,12 +277,20 @@ func DelUser(d *gin.Context) {
 // CheckJwt 验证jwt实效
 func CheckJwt(c *gin.Context) {
 	token := c.Query("token")
-	_, ok := util.VerifyPermissions(token, c)
+	permission, _ := strconv.Atoi(c.Query("per"))
+	data, ok := util.VerifyPermissions(token, c)
 	if !ok {
 		return
 	}
-	c.JSON(200, gin.H{
-		"code": 200,
-		"msg":  "token正常",
-	})
+	if cast.ToInt(data["permission"]) == permission {
+		c.JSON(200, gin.H{
+			"code": 200,
+			"msg":  "token正常",
+		})
+	} else {
+		c.JSON(200, gin.H{
+			"code": 403,
+			"msg":  "未授权访问",
+		})
+	}
 }

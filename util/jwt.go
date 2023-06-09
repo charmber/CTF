@@ -12,7 +12,7 @@ const (
 	Key = "qwe"
 )
 
-//0代表普通权限，1代表超级用户
+// CreateToken @permissions:0代表普通权限，1代表超级用户
 func CreateToken(uid string, permissions int) (string, error) {
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"uid":         uid,

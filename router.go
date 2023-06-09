@@ -40,6 +40,9 @@ func CollectRouter(r *gin.Engine) *gin.Engine {
 	r.POST("api/user/register", controller.Register)
 	r.POST("api/user/login", controller.Login)
 
+	//root用户登录
+	r.POST("api/user/root/login", controller.RootLogin)
+
 	//题目相关
 
 	r.POST("api/problem/upload", controller.ProblemUpload) //上传题目
